@@ -1,39 +1,52 @@
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  ListTodo,
+} from 'lucide-react'
+
 import { useAuth } from '../../context/AuthContext'
+import './Login.css'
 
-const Login = () => {
-  const navigate = useNavigate()
-  const { login } = useAuth()
-
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
-
+export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+
+    if (!email.trim() || !password) {
+      setError('Veuillez remplir tous les champs.')
+      return
+    }
 
     try {
-      await login(formData)
+      setLoading(true)
+
+      await login({
+        email: email.trim(),
+        password,
+      })
+
       navigate('/dashboard')
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        'Impossible de se connecter. Réessaie.'
+        err.response?.data?.error ||
+        'Email ou mot de passe incorrect.'
       )
     } finally {
       setLoading(false)
@@ -41,81 +54,153 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-900">
+    <main className="login-page">
 
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            TODO-APP
-          </h1>
+      {/* Background video */}
+      <video
+        className="login-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="/images/login-poster.jpg"
+      >
+        <source src="/Videos/molten.mp4" type="video/mp4" />
+      </video>
 
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Connecte-toi pour gérer tes tâches.
-          </p>
-        </div>
+      <div className="login-overlay" />
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Main content */}
+      <div className="login-content">
 
-          <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Adresse email
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="exemple@email.com"
-              required
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
+        <div className="login-brand">
+          <div className="brand-icon">
+            <ListTodo size={25} />
           </div>
 
-          <div>
-            <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Mot de passe
-            </label>
+          <span>TaskFlow</span>
+        </div>
 
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Ton mot de passe"
-              required
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
+        <section className="login-card">
+
+          <div className="login-card-header">
+
+            <div className="login-welcome-icon">
+              <CheckCircle2 size={27} />
+            </div>
+
+            <p className="login-eyebrow">
+              YOUR PRODUCTIVITY SPACE
+            </p>
+
+            <h1>Welcome back.</h1>
+
+            <p className="login-description">
+              Connectez-vous et reprenez là où vous vous êtes arrêté.
+            </p>
+
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-300">
+            <div className="login-error" role="alert">
               {error}
-            </p>
+            </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading ? 'Connexion...' : 'Se connecter'}
-          </button>
+          <form onSubmit={handleSubmit}>
 
-        </form>
+            <div className="login-field">
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          Tu n'as pas encore de compte ?{' '}
-          <Link to="/register" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
-            Créer un compte
-          </Link>
-        </p>
+              <label htmlFor="email">Adresse email</label>
+
+              <div className="login-input-wrapper">
+                <Mail size={19} />
+
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="nom@exemple.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="login-field">
+
+              <label htmlFor="password">Mot de passe</label>
+
+              <div className="login-input-wrapper">
+                <Lock size={19} />
+
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Votre mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={
+                    showPassword
+                      ? 'Masquer le mot de passe'
+                      : 'Afficher le mot de passe'
+                  }
+                >
+                  {showPassword
+                    ? <EyeOff size={19} />
+                    : <Eye size={19} />
+                  }
+                </button>
+              </div>
+
+            </div>
+
+            <button
+              type="submit"
+              className="login-submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <span>Connexion en cours...</span>
+              ) : (
+                <>
+                  <span>Se connecter</span>
+                  <ArrowRight size={19} />
+                </>
+              )}
+            </button>
+
+          </form>
+
+          <div className="login-divider">
+            <span />
+            <p>OU</p>
+            <span />
+          </div>
+
+          <p className="login-register">
+            Vous n'avez pas encore de compte ?
+            <Link to="/register">Créer un compte</Link>
+          </p>
+
+        </section>
+
+        <footer className="login-footer">
+          <span>© 2026 TaskFlow</span>
+          <span>Organize. Focus. Achieve.</span>
+        </footer>
 
       </div>
-    </div>
+    </main>
   )
 }
-
-export default Login

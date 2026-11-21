@@ -26,3 +26,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# Vidéos inutilisées
+public/Videos/Pixel-City.mp4
+public/Videos/japanese-pixel-street-corner-cozy-urban-live-wallpaper-wallsflow-com.mp4
+public/Videos/ramen-great-wave-off-kanagawa-moewalls-com.mp4
